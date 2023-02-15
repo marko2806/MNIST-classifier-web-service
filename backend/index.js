@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
+app.set("view engine", "jade");
+
 const auth = require("./routes/auth")
+
 
 app.use("/auth", auth);
 
