@@ -3,22 +3,22 @@ const router = express.Router()
 
 // login route
 router.get('/login', (req, res) => {
-    res.send('Login home page')
+    res.render('login');
 });
 
 // register route
 router.get('/register', (req, res) => {
-    res.send('Register home page')
+    res.render('register');
 });
 
 // email verification route
 router.get('/email-verification', (req, res) => {
-    res.send('Email verification home page')
+    res.render('email_verification');
 });
 
 // login route
 router.get('/forgot-password', (req, res) => {
-    res.send('Forgot password home page')
+    res.render('forgot_password');
 });
 
 module.exports = router
