@@ -1,12 +1,21 @@
 html
     head 
         title Login
+        link(rel="stylesheet", type="text/css", href="../static/css/site.css")
     body 
         h1 Login
         div 
-            form(action="/login", method="post")
+            if errorMessages 
+                each message in errorMessages 
+                    div.text-error #{message}
+            if validationErrors
+                each message in validationErrors 
+                    div.text-error #{message}
+        div.login-form-container 
+            form(action="/auth/login", method="post")
                 p Username:
-                input(type="text", name"username")
+                input(type="text", name="username")
+                i
                 p Password:
                 input(type="password", name="password")
                 hr
