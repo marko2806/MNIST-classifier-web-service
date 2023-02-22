@@ -1,0 +1,29 @@
+html
+    head 
+        title Login
+        link(rel="stylesheet", type="text/css", href="../static/css/site.css")
+    body 
+        div.login-form-container 
+            div
+                h1 Login
+                div 
+                    if messages 
+                        each message in messages 
+                            div.text-success #{message}                    
+                    if errorMessages 
+                        each message in errorMessages 
+                            div.text-error #{message}
+                    if validationErrors
+                        each message in validationErrors 
+                            div.text-error #{message}
+                form(action="/auth/login", method="post")
+                    p E-mail:
+                    input(type="text", name="email")
+                    i
+                    p Password:
+                    input(type="password", name="password")
+                    hr
+                    div
+                        a(href="/auth/forgot-password") Forgot password?
+                    div
+                        input(type="submit", value="Login")  

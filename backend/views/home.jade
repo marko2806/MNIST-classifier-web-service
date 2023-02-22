@@ -1,0 +1,28 @@
+html
+    head 
+        title MNIST Classification
+        link(rel="stylesheet", type="text/css", href="../static/css/site.css")
+    body 
+        h1 MNIST Classification
+        div 
+            if mnistImages 
+                each image in mnistImages 
+                    div.image
+                        img(src=('data:image/jpeg;base64,' + image.image_data), onclick="something('#{'image/jpeg; base64,' + image.image_data}')")
+            if validationErrors
+                each message in validationErrors 
+                    div.text-error #{message}
+        div.login-form-container 
+            form(action="/", method="post")
+                input(type="hidden", name="selected-image-url", id="selected-image-url")
+                input(type="submit", value="Classify")  
+        div.results
+            if results 
+                each result in results 
+                    div.result
+                        div #{result.prediction}
+                        div #{result.score}
+        script.
+            var something = function(e) {
+                document.getElementById('selected-image-url').value = e
+            }
