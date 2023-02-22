@@ -1,3 +1,78 @@
+body{
+    --primary-color: rgb(3, 137, 255);
+}
 .text-error{
     color: red;
+}
+.text-success{
+    color:green;
+}
+
+.login-form-container,
+.register-form-container,
+.forgot-password-container{
+    width: 100%;
+    display:flex;
+    justify-content: center;
+    font-family: sans-serif;
+}
+
+.login-form-container h1,
+.register-form-container h1,
+.forgot-password-container h1{
+    font-size: 1.5rem;
+}
+
+.login-form-container a:visited,
+.register-form-container a:visited,
+.forgot-password-container a:visited{
+    color: var(--primary-color);
+}
+
+.login-form-container > div,
+.register-form-container > div,
+.forgot-password-container > div{
+    border: 1px solid gray;
+    border-radius: 5px;
+    padding: 0px 30px;
+}
+
+.login-form-container p,
+.register-form-container p,
+.forgot-password-container p{
+    margin-top: 16px;
+    margin-bottom: 4px;
+}
+.login-form-container form div,
+.register-form-container form div,
+.forgot-password-container form div{
+    margin-bottom: 10px;
+}
+
+.login-form-container form input,
+.register-form-container form input,
+.forgot-password-container form input{
+    padding: 5px;
+    font-size: 1rem;
+}
+
+.login-form-container form input:focus,
+.register-form-container form input:focus,
+.forgot-password-container form input:focus{
+    padding: 5px;
+    font-size: 1rem;
+    outline-color: var(--primary-color);
+}
+
+
+.login-form-container form input[type="submit"],
+.register-form-container form input[type="submit"],
+.forgot-password-container form input[type="submit"]{
+    box-shadow: none;
+    padding:6px 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid;
+    background-color: var(--primary-color);
+    color: white;
 }

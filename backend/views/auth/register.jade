@@ -1,0 +1,30 @@
+html
+    head 
+        title Register
+        link(rel="stylesheet", type="text/css", href="../static/css/site.css")
+    body 
+
+        div.register-form-container 
+            div
+                h1 Register 
+                div 
+                    if errorMessages 
+                        each message in errorMessages 
+                            div.text-error #{message}
+                    if validationErrors
+                        each message in validationErrors 
+                            div.text-error #{message}
+                div 
+                    p Already have an account?
+                    a(href="/auth/login") Sign in
+                hr
+                form(action="/auth/register", method="post")
+                    p Email:
+                    input(type="text", name="email")
+                    p Password:
+                    input(type="password", name="password")
+                    p Repeat Password:
+                    input(type="password", name="repeat-password") 
+                    hr
+                    div
+                        input(type="submit", value="Register")
