@@ -3,9 +3,6 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 const crypto = require('crypto')
 const nodemailer = require('nodemailer');
-const {
-    Op
-} = require("sequelize");
 
 const {
     User,
@@ -14,24 +11,30 @@ const {
 } = require('../models/models');
 
 
+const smtpServerParams = {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD
+    }
+}
+
 async function hashPassword(password) {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     return hashedPassword;
 }
 
-function getIPAddress(req){
-    // get the first IP-address from x-forwarded-for if proxy is used
-    if (req.header('x-forwarded-for')){
-        return req.header('x-forwarded-for').split(',')[0].trim()
-    }
-    // req.socket.remoteAddress is fallback if x-forwarded-for does not exist in the request
-    return req.socket.remoteAddress;
-}
-
 // login route
 router.get('/login', (req, res) => {
-    res.render('login');
+    if (req.query && req.query.message) {
+        let message = decodeURIComponent(req.query.message);
+        return res.render('auth/login', {
+            messages: [message]
+        })
+    }
+    return res.render('auth/login');
 });
 
 router.post('/login', (req, res) => {
@@ -39,40 +42,33 @@ router.post('/login', (req, res) => {
         // Retrieve user from the database
         User.findOne({
                 where: {
-                    [Op.or]: [{
-                        email: req.body.username
-                    }, {
-                        username: req.body.username
-                    }]
+                    email: req.body.email
                 }
             })
             .then(async user => {
                 if (user && user.email_verified) {
-                    console.log(user)
-                    console.log(await hashPassword(req.body.password))
-                    const passwordCorrect = await bcrypt.compare(req.body.password, user.password_hash);
-                    if (!passwordCorrect) {
+                    const isPasswordCorrect = await bcrypt.compare(req.body.password, user.password_hash);
+                    if (!isPasswordCorrect) {
                         // If the password does not match, send an error response
-                        return res.render("login", {
+                        return res.render("auth/login", {
                             validationErrors: [
-                                "Invalid username or password1"
+                                "Invalid email or password"
                             ]
                         });
                     }
                     req.session.userId = user.user_id;
                     res.redirect('/');
                 } else {
-                    return res.render("login", {
+                    return res.render("auth/login", {
                         validationErrors: [
-                            "Invalid username or password2"
+                            "Invalid email or password"
                         ]
                     });
                 }
             })
-            .catch(error => {
-                console.log("error");
-                console.log(error);
-                return res.render("login", {
+            .catch((error) => {
+                console.error(error);
+                return res.render("auth/login", {
                     errorMessages: [
                         "Error logging in"
                     ]
@@ -87,39 +83,52 @@ router.get('/logout', (req, res) => {
             console.log('Destroyed session');
         })
     }
-    res.redirect('/auth/login');
+    let message = encodeURIComponent("Logged out successfully");
+    return res.redirect('login?message=' + message);
 });
 
 // register route
 router.get('/register', (req, res) => {
-    res.render('register');
+    res.render('auth/register');
 });
+
+function getIPAddress(req) {
+    // get the first IP-address from x-forwarded-for if proxy is used
+    if (req.header('x-forwarded-for')) {
+        return req.header('x-forwarded-for').split(',')[0].trim()
+    }
+    // req.socket.remoteAddress is fallback if x-forwarded-for does not exist in the request
+    return req.socket.remoteAddress;
+}
 
 router.post('/register', async (req, res) => {
     if (req.body) {
         const registeredUser = req.body;
 
         //chech that the user is not already created
-        const dbUser = await User.findOne({where:{email:registeredUser.email}});
-        if(dbUser){
-            return res.render("register", {
+        const dbUser = await User.findOne({
+            where: {
+                email: registeredUser.email
+            }
+        });
+        if (dbUser) {
+            return res.render("auth/register", {
                 validationErrors: ["Account with entered email already exists"]
             });
         }
 
         if (!registeredUser.password) {
-            return res.render("register", {
+            return res.render("auth/register", {
                 validationErrors: ["Please enter password"]
             });
         }
         if (registeredUser.password.length < 8) {
-            return res.render("register", {
+            return res.render("auth/register", {
                 validationErrors: ["Please enter password with at least 8 characters"]
             });
         }
         const hashedPassword = await hashPassword(registeredUser.password);
         User.create({
-            username: registeredUser.username,
             email: registeredUser.email,
             password_hash: hashedPassword
         }).then(async (user) => {
@@ -136,14 +145,7 @@ router.post('/register', async (req, res) => {
                 expired: false
             }).then(() => {
                 // TODO export email config to config file
-                const transporter = nodemailer.createTransport({
-                    host: 'smtp.ethereal.email',
-                    port: 587,
-                    auth: {
-                        user: 'kallie.turcotte@ethereal.email',
-                        pass: 'TCMUdDttb3W492F6mp'
-                    }
-                });
+                const transporter = nodemailer.createTransport(smtpServerParams);
                 const mailOptions = {
                     from: 'kallie.turcotte@ethereal.email',
                     to: user.email,
@@ -153,7 +155,7 @@ router.post('/register', async (req, res) => {
 
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
-                        console.log(error);
+                        console.error(error);
                         res.status(500).send('Error sending email');
                     } else {
                         console.log('Email sent: ' + info.response);
@@ -197,14 +199,14 @@ router.get('/email-verification/:token', async (req, res) => {
             user_id: tokenRecord.user_id
         }
     });
-    res.render('email_verification', {
+    res.render('auth/email_verification', {
         emailVerified: user.email_verified
     });
 });
 
 // login route
 router.get('/forgot-password', (req, res) => {
-    res.render('forgot_password');
+    res.render('auth/forgot_password');
 });
 
 router.post('/forgot-password', async (req, res) => {
@@ -233,14 +235,7 @@ router.post('/forgot-password', async (req, res) => {
         expired: false
     });
     // Send an email to the user with the password reset link
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.ethereal.email',
-        port: 587,
-        auth: {
-            user: 'kallie.turcotte@ethereal.email',
-            pass: 'TCMUdDttb3W492F6mp'
-        }
-    });
+    const transporter = nodemailer.createTransport(smtpServerParams);
 
     const mailOptions = {
         from: 'kallie.turcotte@ethereal.email',
@@ -261,7 +256,7 @@ router.post('/forgot-password', async (req, res) => {
 })
 
 router.get('/reset-password/:token', (req, res) => {
-    res.render('reset_password', {
+    res.render('auth/reset_password', {
         token: req.params.token
     });
 });
@@ -269,33 +264,32 @@ router.get('/reset-password/:token', (req, res) => {
 router.post('/reset-password', async (req, res) => {
     if (req.body) {
         const passwordResetToken = req.body.token;
-        console.log(passwordResetToken);
         const tokenHash = crypto.createHash('sha256').update(passwordResetToken).digest('hex');
         const newPassword = req.body["new-password"];
 
-        const passwordResetAttempt = await PasswordResetAttempt.findOne({where:{
-            reset_token_hash: tokenHash
-        }}) // TODO: join with user;
+        const passwordResetAttempt = await PasswordResetAttempt.findOne({
+            where: {
+                reset_token_hash: tokenHash
+            }
+        }) // TODO: join with user;
         if (!passwordResetAttempt) {
             return res.status(404).json({
                 message: 'Invalid token'
             });
         }
 
-        const user = await User.findOne({where:{
-            user_id: passwordResetAttempt.user_id
-        }})
+        const user = await User.findOne({
+            where: {
+                user_id: passwordResetAttempt.user_id
+            }
+        })
         if (!user) {
             return res.status(404).json({
                 message: 'User not found'
             });
         }
         const hashedPassword = await hashPassword(newPassword);
-        console.log(user);
-        console.log("Hash before and after")
-        console.log(user.password_hash);
         user.password_hash = hashedPassword;
-        console.log(user.password_hash);
         await user.save();
 
         res.json({

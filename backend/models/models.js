@@ -14,14 +14,6 @@ const User = sequelize.define('users', {
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4
     },
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notNull: true,
-            notEmpty: true,
-        }
-    },
     email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -35,6 +27,24 @@ const User = sequelize.define('users', {
         allowNull: false
     },
     email_verified: DataTypes.BOOLEAN
+}, {
+    timestamps: false
+});
+
+const Images = sequelize.define('images', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    image_label: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    image_data: {
+        type: DataTypes.BLOB,
+        allowNull: false
+    }
 }, {
     timestamps: false
 });
@@ -81,6 +91,7 @@ User.belongsToMany(PasswordResetAttempt, {
 module.exports = {
     User,
     EmailVerificationTokens,
-    PasswordResetAttempt
+    PasswordResetAttempt,
+    Images
 }
 
