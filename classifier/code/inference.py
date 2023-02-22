@@ -6,6 +6,8 @@ import requests
 import torchvision.transforms as transforms
 import os
 from model import resnet18
+import base64
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +32,11 @@ def input_fn(request_body, content_type='application/json'):
         input_data = json.loads(request_body)
         url = input_data['url']
         logger.info(f'Image url: {url}')
-        image_data = Image.open(requests.get(url, stream=True).raw)
+        try:
+            image_data = Image.open(requests.get(url, stream=True).raw)
+        except:
+            image = base64.b64decode(url.split("base64,")[1]) 
+            image_data = Image.open(io.BytesIO(image))
 
         image_transform = transforms.Compose([
             transforms.ToTensor(),
