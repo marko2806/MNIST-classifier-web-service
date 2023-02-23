@@ -7,9 +7,9 @@ The image classification accuracy is evaluated using four metrics: accuracy, pre
 ### Test Set Results
 The pre-trained ResNet-18 model was evaluated on a separate test set of MNIST images. The following accuracy metrics were obtained:
 
-Accuracy: 99.39%
-Precision: 99.39%
-Recall: 99.37%
+- Accuracy: 99.39%
+- Precision: 99.39%
+- Recall: 99.37%
 Confusion Matrix:
 
 
@@ -26,7 +26,7 @@ To install and run this application locally, follow these steps:
 - Run docker-compose up to build and start the containers.
 - Navigate to http://localhost:3000 in your web browser to access the application.
 
-##Usage
+## Usage
 To use this application, follow these steps:
 
 - Navigate to http://localhost:3000 in your web browser.
@@ -34,7 +34,7 @@ To use this application, follow these steps:
 - Upload an image to receive a classification result.
 - View the accuracy metrics for the classification result.
 
-##Links
+## Links
 
 The following links are the links which users can access directly:
 
