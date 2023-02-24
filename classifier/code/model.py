@@ -1,5 +1,6 @@
 import torch.nn as nn
 
+# Basic block of ResNet18 network
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -24,7 +25,7 @@ class BasicBlock(nn.Module):
         out = nn.ReLU()(out)
         return out
 
-
+# ResNet-18 Module with a change where input contains only one channel instead 3 as described in paper
 class ResNet(nn.Module):
     def __init__(self, block, num_blocks, num_classes=10):
         super(ResNet, self).__init__()
