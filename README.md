@@ -7,12 +7,12 @@ The image classification accuracy is evaluated using four metrics: accuracy, pre
 ### Test Set Results
 The pre-trained ResNet-18 model was evaluated on a separate test set of MNIST images. The following accuracy metrics were obtained:
 
-- Accuracy: 99.39%
-- Precision: 99.39%
-- Recall: 99.37%
+- Accuracy: 99.30%
+- Precision: 99.30%
+- Recall: 99.29%
 - Confusion Matrix:
 
-![alt text](https://github.com/marko2806/MNIST-classifier-web-service/blob/main/classifier/confusion_matrix.png?raw=true)
+![alt text](https://github.com/marko2806/MNIST-classifier-web-service/blob/main/classifier/confusion_matrix.jpg?raw=true)
 
 
 ## Deployment
