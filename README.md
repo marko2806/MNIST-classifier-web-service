@@ -10,8 +10,8 @@ The pre-trained ResNet-18 model was evaluated on a separate test set of MNIST im
 - Accuracy: 99.39%
 - Precision: 99.39%
 - Recall: 99.37%
-Confusion Matrix:
-
+- Confusion Matrix:
+[alt text](https://github.com/marko2806/MNIST-classifier-web-service/blob/main/classifier/confusion_matrix.png?raw=true)
 
 
 ## Deployment
