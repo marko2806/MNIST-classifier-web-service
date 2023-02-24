@@ -2,11 +2,9 @@ const {
     Sequelize,
     DataTypes
 } = require('sequelize');
+require('dotenv')
 
-const sequelize = new Sequelize('MNIST-web-service', 'postgres', 'bazepodataka', {
-    host: 'localhost',
-    dialect: 'postgres'
-});
+const sequelize = new Sequelize(process.env.DB_URL);
 
 const User = sequelize.define('users', {
     user_id: {
@@ -89,6 +87,7 @@ User.belongsToMany(PasswordResetAttempt, {
 });
 
 module.exports = {
+    sequelize,
     User,
     EmailVerificationTokens,
     PasswordResetAttempt,
