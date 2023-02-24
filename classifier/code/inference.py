@@ -37,6 +37,9 @@ def input_fn(request_body, content_type='application/json'):
         except:
             image = base64.b64decode(url.split("base64,")[1]) 
             image_data = Image.open(io.BytesIO(image))
+        finally:
+            if image_data is None:
+                raise Exception(f'Invalid request')
 
         image_transform = transforms.Compose([
             transforms.ToTensor(),
