@@ -13,7 +13,7 @@ const app = express();
 const router = express.Router();
 const port = process.env.APP_PORT;
 
-const {Images} = require('./models/models')
+const {sequelize, Images} = require('./models/models')
 
 
 
@@ -26,7 +26,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(process.env.STATIC_FILES_PATH,express.static('static'))
+app.use(process.env.APP_STATIC_FILES_PATH,express.static('static'))
 
 //session middleware
 app.use(sessions({
@@ -61,6 +61,7 @@ function blobToBase64(blob) {
 // function for retreiving mnist images and converting image data to base64 format
 async function getMnistImages(take, skip){
   let images = await Images.findAll({
+    order: sequelize.random(),
     limit: take,
     offset: skip
   });
@@ -122,7 +123,7 @@ router.post('/', sessionChecker, async (req, res) => {
       .catch(async () => {
         res.render('home', {
           mnistImages: await getMnistImages(process.env.MNIST_DEFAULT_IMAGE_LIST_SIZE, 0),
-          error: 'Something went wrong when performing classification'
+          error: 'Something went wrong while performing classification'
         });
       });
   }
